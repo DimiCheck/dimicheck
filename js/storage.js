@@ -76,3 +76,13 @@ function resetSavedState() {
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
 }
+
+/* ===================== 시간표 저장/복원 (sessionStorage) ===================== */
+function saveTimetableData(key, data) {
+    sessionStorage.setItem(key, JSON.stringify(data));
+}
+
+function loadTimetableData(key) {
+    const data = sessionStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+}

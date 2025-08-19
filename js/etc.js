@@ -175,3 +175,216 @@
         overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
     }
 })();
+
+// 시간표 표시 기능
+document.addEventListener('DOMContentLoaded', () => {
+    const timeItem = document.getElementById('timeItem');
+    if (!timeItem) return;
+
+    const timetableModal = document.getElementById('timetableModal');
+    const modalClose = timetableModal.querySelector('.modal-close');
+    const gradeSelector = document.getElementById('gradeSelector');
+    const classSelector = document.getElementById('classSelector');
+    const timetableContainer = document.getElementById('timetableContainer');
+
+    const ATPT_OFCDC_SC_CODE = 'J10'; // 경기도교육청
+    const SD_SCHUL_CODE = '7530560'; // 한국디지털미디어고등학교
+    const API_KEY = 'da82433f0f3a4351bda4ca9a0f11fc7d'; // NEIS API KEY
+
+    let isInitialized = false;
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const day = ('0' + date.getDate()).slice(-2);
+        return year + month + day;
+    }
+
+    function getWeekDays() {
+        const today = new Date();
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(today.setDate(diff));
+        
+        const weekDays = [];
+        for (let i = 0; i < 5; i++) {
+            const weekDay = new Date(monday);
+            weekDay.setDate(monday.getDate() + i);
+            weekDays.push(formatDate(weekDay));
+        }
+        return weekDays;
+    }
+
+    function renderTimetable(data) {
+        const days = ['월', '화', '수', '목', '금'];
+        const maxPeriod = 7;
+
+        let tableHTML = '<table>';
+        tableHTML += '<thead><tr><th>교시</th>';
+        days.forEach(day => tableHTML += `<th>${day}</th>`);
+        tableHTML += '</tr></thead>';
+        
+        tableHTML += '<tbody>';
+        for (let period = 1; period <= maxPeriod; period++) {
+            tableHTML += `<tr><td>${period}</td>`;
+            for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
+                const dayData = data[dayIndex] || [];
+                const subject = dayData.find(item => item.PERIO == period)?.ITRT_CNTNT || '';
+                tableHTML += `<td>${subject}</td>`;
+            }
+            tableHTML += '</tr>';
+        }
+        tableHTML += '</tbody></table>';
+
+        timetableContainer.innerHTML = tableHTML;
+    }
+
+    // 캐시 유효성 검사
+    function isValidWeeklyData(candidate, expectedWeekStart) {
+        if (!candidate) return false;
+        // 래핑된 형태 { weekStart, savedAt, grade, classNum, data }
+        let data = candidate;
+        if (!Array.isArray(candidate) && candidate.data) {
+            if (expectedWeekStart && candidate.weekStart && String(candidate.weekStart) !== String(expectedWeekStart)) {
+                return false; // 주 시작 날짜 불일치
+            }
+            data = candidate.data;
+        }
+        if (!Array.isArray(data)) return false;
+        if (data.length !== 5) return false; // 평일 5일 분량
+        // 각 요일은 배열이어야 하고 전체가 전부 빈 배열이면 무효
+        if (!data.every(d => Array.isArray(d))) return false;
+        const hasAny = data.some(d => Array.isArray(d) && d.length > 0);
+        if (!hasAny) return false;
+        // 레코드의 기본 키들이 존재하는지 대략 점검
+        const looksReasonable = data.every(day => day.every(r => r && typeof r === 'object' && (
+            'PERIO' in r || 'ITRT_CNTNT' in r || 'SUBJECT' in r
+        )));
+        return looksReasonable;
+    }
+
+    function unwrapWeekly(candidate) {
+        if (!candidate) return null;
+        if (Array.isArray(candidate)) return candidate;
+        if (candidate && Array.isArray(candidate.data)) return candidate.data;
+        return null;
+    }
+
+    async function fetchTimetable(grade, classNum) {
+        timetableContainer.innerHTML = '<p>시간표를 불러오는 중입니다...</p>';
+        const weekDays = getWeekDays();
+        const weekStart = weekDays[0];
+        const cacheKey = `timetable_${grade}_${classNum}_${weekStart}`;
+
+        // 캐시 확인 및 유효성 검사
+        const cached = loadTimetableData(cacheKey);
+        if (isValidWeeklyData(cached, weekStart)) {
+            renderTimetable(unwrapWeekly(cached));
+            return;
+        }
+
+        try {
+            const requests = weekDays.map(date => {
+                const url = new URL('https://open.neis.go.kr/hub/hisTimetable');
+                const params = {
+                    KEY: API_KEY,
+                    Type: 'json',
+                    ATPT_OFCDC_SC_CODE,
+                    SD_SCHUL_CODE,
+                    GRADE: grade,
+                    CLASS_NM: classNum,
+                    ALL_TI_YMD: date
+                };
+                Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+                return fetch(url);
+            });
+
+            const responses = await Promise.all(requests);
+            const results = await Promise.all(responses.map(res => res.json()));
+            
+            const weeklyData = results.map(result => {
+                if (result.hisTimetable && result.hisTimetable[1] && result.hisTimetable[1].row) {
+                    return result.hisTimetable[1].row;
+                }
+                return [];
+            });
+
+            // 비정상/빈 데이터면 재시도 없이 실패 처리
+            if (!isValidWeeklyData(weeklyData, weekStart)) {
+                throw new Error('수신한 시간표 데이터가 비정상입니다.');
+            }
+
+            // 메타 포함하여 저장 (기존 순수 배열 캐시와도 호환)
+            const wrapped = {
+                weekStart,
+                savedAt: Date.now(),
+                grade,
+                classNum,
+                data: weeklyData
+            };
+            saveTimetableData(cacheKey, wrapped);
+            renderTimetable(weeklyData);
+
+        } catch (error) {
+            console.error('Failed to fetch timetable:', error);
+            timetableContainer.innerHTML = '<p>시간표를 불러오는데 실패했습니다. 다시 시도해주세요.</p>';
+        }
+    }
+
+    function initTimetablePopup() {
+        if (isInitialized) return;
+
+        for (let i = 1; i <= 3; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i}학년`;
+            gradeSelector.appendChild(option);
+        }
+
+        for (let i = 1; i <= 6; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i}반`;
+            classSelector.appendChild(option);
+        }
+
+        const lastGrade = loadTimetableData('last_grade') || '1';
+        const lastClass = loadTimetableData('last_class') || '3';
+
+        gradeSelector.value = lastGrade;
+        classSelector.value = lastClass;
+
+        gradeSelector.addEventListener('change', updateTimetable);
+        classSelector.addEventListener('change', updateTimetable);
+        
+        isInitialized = true;
+    }
+    
+    function updateTimetable() {
+        const grade = gradeSelector.value;
+        const classNum = classSelector.value;
+        saveTimetableData('last_grade', grade);
+        saveTimetableData('last_class', classNum);
+        fetchTimetable(grade, classNum);
+    }
+
+    function openModal() {
+        initTimetablePopup();
+        timetableModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        updateTimetable();
+    }
+
+    function closeModal() {
+        timetableModal.hidden = true;
+        document.body.style.overflow = 'auto';
+    }
+
+    timeItem.addEventListener('click', openModal);
+    modalClose.addEventListener('click', closeModal);
+    timetableModal.addEventListener('click', (e) => {
+        if (e.target === timetableModal) {
+            closeModal();
+        }
+    });
+});

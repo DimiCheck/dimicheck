@@ -108,6 +108,7 @@
     </button>
     <div id="infoMenu" class="fab-menu" role="menu">
       <button class="fab-item" role="menuitem" id="foodItem">오늘 급식 보기</button>
+      <button class="fab-item" role="menuitem" id="timeItem">오늘 시간표</button>
     </div>
   </div>
 
@@ -150,6 +151,19 @@
   <script src="js/info.js"></script>
 
 
+
+  <!-- 시간표임. -->
+  <div id="timetableModal" class="modal-overlay" hidden>
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2>주간 시간표</h2>
+      <div class="timetable-controls">
+        <select id="gradeSelector"></select>
+        <select id="classSelector"></select>
+      </div>
+      <div id="timetableContainer"></div>
+    </div>
+  </div>
 
 </body>
 
