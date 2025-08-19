@@ -22,7 +22,7 @@ function createPlaceholder(num) {
 }
 
 /* ===================== 자석 생성 ===================== */
-function createMagnets(end = 35, skipNumbers = [7, 12]) {
+function createMagnets(end = 31, skipNumbers = [12]) {
   const container = document.getElementById('magnetContainer');
   const rows = 7, cols = 5, size = 50, gap = 15;
   let n = 1;
