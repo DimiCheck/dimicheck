@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-    
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,8 +8,8 @@
   <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
 
   <!-- 노이즈 미터와 버튼을 묶어서 오른쪽 위에 세로로 배치 -->
-</head>
 
+</head>
 <body>
   <!-- Magnet Container -->
   <div class="magnet-container" id="magnetContainer"></div>
@@ -94,9 +93,9 @@
   <button class="fullscreen-btn" onclick="toggleFullscreen()">전체화면</button>
   <button class="exit-fullscreen-btn" onclick="exitFullscreen()">✕</button>
 
-  <!-- 추가 정보 버튼 -->
+  <!-- 급식 버튼 -->
   <div class="gfab-container" aria-live="polite">
-    <button id="infoFab" class="fab" aria-haspopup="true" aria-expanded="false" aria-controls="infoMenu" title="정보 메뉴">
+    <button id="infoFab" class="fab" aria-haspopup="true" aria-expanded="false" aria-controls="infoMenu" title="게임 메뉴">
       <img src="src/infoicn.png" alt="정보"/>
     </button>
     <div id="infoMenu" class="fab-menu" role="menu">
@@ -139,7 +138,10 @@
   <script src="js/storage.js"></script>
   <script src="js/magnet.js"></script>
   <script src="js/time.js"></script>
+  <script src="js/etc.js"></script>
   <script src="js/info.js"></script>
+
+
 
 </body>
 </html>

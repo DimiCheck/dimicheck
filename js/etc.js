@@ -175,4 +175,3 @@
         overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
     }
 })();
-  

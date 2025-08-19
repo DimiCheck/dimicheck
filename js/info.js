@@ -1,178 +1,213 @@
-    // 게임 FAB 토글 및 메뉴 동작
-    (function () {
-        const fab = document.getElementById('gameFab');
-        const menu = document.getElementById('gameMenu');
-        const gomoku = document.getElementById('gomokuItem');
-        const speedt = document.getElementById('speedTest');
-        const circlet = document.getElementById('circleItem');
-        const fireworksBtn = document.getElementById('fireworksItem');
-        let menuFireworks = null;
-        let fwStopTimer = null;
-  
-        if (!fab || !menu) return;
-  
-        function closeMenu() {
-          menu.classList.remove('open');
-          fab.setAttribute('aria-expanded', 'false');
-        }
-  
-        function toggleMenu(e) {
-          e.stopPropagation();
-          const isOpen = menu.classList.toggle('open');
-          fab.setAttribute('aria-expanded', String(isOpen));
-        }
-  
-        fab.addEventListener('click', toggleMenu);
-        document.addEventListener('click', (e) => {
-          if (!menu.classList.contains('open')) return;
-          const t = e.target;
-          if (t === fab || fab.contains(t) || menu.contains(t)) return;
-          closeMenu();
-        });
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') closeMenu();
-        });
-  
-        if (gomoku) {
-          gomoku.addEventListener('click', () => {
-            window.location.href = 'gomoku.html';
-          });
-        }
-        if (speedt) {
-          speedt.addEventListener('click', () => {
-            window.location.href = 'speed.html';
-          });
-        }
-        if (circlet) {
-          circlet.addEventListener('click', () => {
-            window.location.href = 'circle.html';
-          });
-        }
-        if (fireworksBtn) {
-          fireworksBtn.addEventListener('click', () => {
-            const container = document.querySelector('.fireworks');
-            if (!container || !window.Fireworks) return;
-            if (!menuFireworks) menuFireworks = new Fireworks.default(container);
-            menuFireworks.start();
-            if (fwStopTimer) clearTimeout(fwStopTimer);
-            fwStopTimer = setTimeout(() => {
-              try {
-                if (menuFireworks && typeof menuFireworks.stop === 'function') menuFireworks.stop(true);
-              } catch (_) {}
-            }, 3500);
-            closeMenu();
-          });
-        }
-      })();
-  
-      $(".analog-clock")
-      .on("mousedown touchstart", function () {
-        $(".ultraman").show();
-      })
-      .on("mouseup mouseleave touchend touchcancel", function () {
-        $(".ultraman").hide();
+(function() {
+    // --- 공통 설정 및 DOM 요소 ---
+    const NEIS_KEY = "da82433f0f3a4351bda4ca9a0f11fc7d";
+    const ATPT_OFCDC_SC_CODE = "J10";
+    const SD_SCHUL_CODE = "7530560";
+
+    const modal = document.getElementById('infoModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalStatus = document.getElementById('modalStatus');
+    const closeBtn = document.getElementById('closeInfoModal');
+    
+    const infoFab = document.getElementById('infoFab');
+    const infoMenu = document.getElementById('infoMenu');
+
+    const timetableItem = document.getElementById('timetableItem');
+    const timetableContainer = document.getElementById('timetableContainer');
+    const timetableGrid = document.getElementById('timetableGrid');
+
+    const lunchItem = document.getElementById('lunchItem');
+    const lunchContainer = document.getElementById('lunchContainer');
+
+    // --- 캐시 변수 ---
+    let cachedTimetableData = null;
+    let cachedLunchData = null;
+
+    // --- 유틸리티 ---
+    const fmtYMD = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}${m}${day}`;
+    };
+
+    // --- 시간표 관련 함수 ---
+    function getMonday(d) {
+      const x = new Date(d);
+      const day = (x.getDay() + 6) % 7; // Mon=0
+      x.setDate(x.getDate() - day);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    }
+
+    function renderTimetable(rows) {
+      const days = ["월", "화", "수", "목", "금"];
+      const periods = Array.from({ length: 7 }, (_, i) => i + 1);
+      const grid = Array.from({ length: 7 }, () => Array(5).fill(""));
+
+      for (const r of rows) {
+        const ymd = r.ALL_TI_YMD;
+        const perio = Number(r.PERIO);
+        const dt = new Date(Number(ymd.slice(0, 4)), Number(ymd.slice(4, 6)) - 1, Number(ymd.slice(6, 8)));
+        const dow = (dt.getDay() + 6) % 7;
+        if (dow >= 5 || perio < 1 || perio > 7) continue;
+        const subject = r.ITRT_CNTNT || r.SUBJECT || "";
+        const room = r.CLRM_NM ? `<br><small>(${r.CLRM_NM})</small>` : "";
+        grid[perio - 1][dow] = subject + room;
+      }
+
+      timetableGrid.innerHTML = `
+        <thead><tr><th>교시</th>${days.map(d => `<th>${d}</th>`).join("")}</tr></thead>
+        <tbody>${periods.map(p => `<tr><th>${p}</th>${grid[p-1].map(txt => `<td>${txt}</td>`).join("")}</tr>`).join("")}</tbody>
+      `;
+    }
+
+    async function fetchTimetable(weekStartDate) {
+      const from = fmtYMD(weekStartDate);
+      const to = fmtYMD(new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate() + 4));
+      const qs = new URLSearchParams({
+        KEY: NEIS_KEY,
+        Type: "json",
+        pIndex: "1",
+        pSize: "1000",
+        ATPT_OFCDC_SC_CODE,
+        SD_SCHUL_CODE,
+        AY: "2025", SEM: "2", GRADE: "1", CLASS_NM: "3",
+        TI_FROM_YMD: from,
+        TI_TO_YMD: to
       });
-  
-// 급식 정보 표시 기능
-(function () {
-    const foodItem = document.getElementById('foodItem');
-    if (!foodItem) return;
-
-    foodItem.addEventListener('click', fetchAndShowMeal);
-
-    function getTodayDateString() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+      const url = `https://open.neis.go.kr/hub/hisTimetable?${qs.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.RESULT) throw new Error(`${data.RESULT.CODE}: ${data.RESULT.MESSAGE}`);
+      return data.hisTimetable?.[1]?.row ?? [];
     }
 
-    async function fetchAndShowMeal() {
-        const date = getTodayDateString();
-        const url = `https://api.xn--299a1v27nvthhjj.com/meal/${date}`;
+    async function loadAndShowTimetable() {
+      modalTitle.textContent = "주간 시간표 (1-3)";
+      lunchContainer.hidden = true;
+      timetableContainer.hidden = false;
 
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            createMealModal(data);
-        } catch (error) {
-            console.error('Fetch error:', error);
-            alert('급식 정보를 불러오는 데 실패했습니다.');
-        }
+      if (cachedTimetableData) {
+        modalStatus.textContent = "이번 주 시간표 (캐시됨)";
+        renderTimetable(cachedTimetableData);
+        return;
+      }
+
+      try {
+        modalStatus.textContent = "시간표를 불러오는 중…";
+        timetableGrid.innerHTML = "";
+        const monday = getMonday(new Date());
+        const rows = await fetchTimetable(monday);
+        cachedTimetableData = rows;
+        modalStatus.textContent = `이번 주 시간표 (${monday.toLocaleDateString()} ~)`;
+        renderTimetable(rows);
+      } catch (e) {
+        modalStatus.textContent = "시간표 오류: " + e.message;
+      }
     }
 
-    function createMealModal(data) {
-        // 이전 모달 제거
-        const existingModal = document.querySelector('.meal-modal-overlay');
-        if (existingModal) {
-            existingModal.remove();
-        }
-
-        const overlay = document.createElement('div');
-        overlay.className = 'meal-modal-overlay';
-
-        const content = document.createElement('div');
-        content.className = 'meal-modal-content';
-
-        const header = document.createElement('div');
-        header.className = 'meal-modal-header';
-
-        const title = document.createElement('h2');
-        title.className = 'meal-modal-title';
-        title.textContent = `${data.date} 급식 정보`;
-
-        const closeButton = document.createElement('button');
-        closeButton.className = 'meal-modal-close';
-        closeButton.innerHTML = '&times;';
-
-        const mealGrid = document.createElement('div');
-        mealGrid.className = 'meal-grid';
-
-        const breakfastCard = createMealCard('아침', data.breakfast.replaceAll("/", "\n") || '정보 없음');
-        const lunchCard = createMealCard('점심', data.lunch.replaceAll("/", "\n") || '정보 없음');
-        const dinnerCard = createMealCard('저녁', data.dinner.replaceAll("/", "\n") || '정보 없음');
-
-        mealGrid.append(breakfastCard, lunchCard, dinnerCard);
-        header.append(title, closeButton);
-        content.append(header, mealGrid);
-        overlay.append(content);
-        document.body.append(overlay);
-
-        // 애니메이션을 위해 클래스 추가
-        setTimeout(() => overlay.classList.add('visible'), 10);
-
-        // 닫기 이벤트
-        closeButton.addEventListener('click', () => closeModal(overlay));
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                closeModal(overlay);
-            }
-        });
+    // --- 급식 관련 함수 ---
+    function renderLunch(data) {
+      if (!data || !data.dishesHtml) {
+        lunchContainer.innerHTML = "오늘 점심 메뉴 정보가 없습니다.";
+        return;
+      }
+      const menuItems = data.dishesHtml.split('<br/>').map(item => `<li>${item.trim()}</li>`).join('');
+      lunchContainer.innerHTML = `
+        <ul class="lunch-menu-list">${menuItems}</ul>
+        <div class="lunch-calorie">${data.calorie || ''}</div>
+      `;
     }
 
-    function createMealCard(title, menu) {
-        const card = document.createElement('div');
-        card.className = 'meal-card';
-
-        const cardTitle = document.createElement('h3');
-        cardTitle.className = 'meal-card-title';
-        cardTitle.textContent = title;
-
-        const cardMenu = document.createElement('p');
-        cardMenu.className = 'meal-card-menu';
-        cardMenu.textContent = menu.replace(/\n/g, '\n');
-
-        card.append(cardTitle, cardMenu);
-        return card;
+    async function fetchLunch() {
+      const ymd = fmtYMD(new Date());
+      const qs = new URLSearchParams({
+        KEY: NEIS_KEY,
+        Type: "json",
+        pIndex: "1",
+        pSize: "1",
+        ATPT_OFCDC_SC_CODE,
+        SD_SCHUL_CODE,
+        MMEAL_SC_CODE: "2", // 중식
+        MLSV_YMD: ymd
+      });
+      const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?${qs.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.RESULT) {
+          if (data.RESULT.CODE === 'INFO-200') return null; // 데이터 없는 경우
+          throw new Error(`${data.RESULT.CODE}: ${data.RESULT.MESSAGE}`);
+      }
+      const row = data.mealServiceDietInfo?.[1]?.row?.[0];
+      if (!row) return null;
+      return {
+          dishesHtml: row.DDISH_NM,
+          calorie: row.CAL_INFO
+      };
     }
 
-    function closeModal(overlay) {
-        overlay.classList.remove('visible');
-        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    async function loadAndShowLunch() {
+      modalTitle.textContent = "오늘의 점심 메뉴";
+      timetableContainer.hidden = true;
+      lunchContainer.hidden = false;
+
+      if (cachedLunchData) {
+        modalStatus.textContent = "오늘의 점심 (캐시됨)";
+        renderLunch(cachedLunchData);
+        return;
+      }
+      
+      try {
+        modalStatus.textContent = "점심 메뉴를 불러오는 중…";
+        lunchContainer.innerHTML = "";
+        const lunchData = await fetchLunch();
+        cachedLunchData = lunchData;
+        modalStatus.textContent = `오늘(${fmtYMD(new Date())})의 점심`;
+        renderLunch(lunchData);
+      } catch (e) {
+        modalStatus.textContent = "급식 정보 오류: " + e.message;
+      }
     }
-})();
-  
+
+    // --- 공통 이벤트 리스너 ---
+    function closeInfoMenu() {
+      infoMenu.classList.remove('open');
+      infoFab.setAttribute('aria-expanded', 'false');
+    }
+
+    infoFab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = infoMenu.classList.toggle('open');
+      infoFab.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    timetableItem.addEventListener('click', () => {
+      modal.hidden = false;
+      loadAndShowTimetable();
+      closeInfoMenu();
+    });
+
+    lunchItem.addEventListener('click', () => {
+      modal.hidden = false;
+      loadAndShowLunch();
+      closeInfoMenu();
+    });
+
+    closeBtn.addEventListener('click', () => { modal.hidden = true; });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.hidden = true; });
+    document.addEventListener('click', (e) => {
+      if (!infoMenu.classList.contains('open')) return;
+      const t = e.target;
+      if (t === infoFab || infoFab.contains(t) || infoMenu.contains(t)) return;
+      closeInfoMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!modal.hidden) modal.hidden = true;
+        else closeInfoMenu();
+      }
+    });
+  })();
