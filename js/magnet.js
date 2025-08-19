@@ -36,7 +36,7 @@ function createMagnets(end = 31, skipNumbers = [12]) {
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      while (!allowed.has(n) && n < end){n++; console.log(n);}
+      while (!allowed.has(n) && n < end){n++;}
       if (n > end){break;}
 
       const x = c * (size + gap) + 50;

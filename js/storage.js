@@ -1,3 +1,21 @@
+// js/info.js
+(function (global) {
+  const props = global.__PAGE_PROPS__ || {};
+
+  // 전역 상태 보관소
+  const App = global.App || {};
+  App.grade = props.grade;          // ex) 1
+  App.section = props.section;      // ex) 3
+  App.config = props.config || { classSize: 30, skipNumbers: [] };
+  App.serverNow = props.serverNow;  // 서버 시각
+
+  // 다른 곳에서 import 없이 window.App으로 접근 가능
+  global.App = App;
+
+  // 디버그용(원하면 지워도 됨)
+  // console.log("[App]", App);
+})(window);
+
 $(".ultraman").hide();
 /* ===================== 저장/복원 (localStorage) ===================== */
 const STORAGE_KEY = 'modernClock.magnets.v1';

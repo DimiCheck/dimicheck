@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIMI Check</title>
+  <link rel="stylesheet" href="main.css">
+  <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+</head>
+
+<body>
+  <!-- Magnet Container -->
+  <div class="magnet-container" id="magnetContainer"></div>
+
+  <!-- 왼쪽 위: 기타 사유 패널 -->
+  <div id="reasonPanel">
+    <div class="panel-title">기타 사유</div>
+    <div id="reasonList"></div>
+  </div>
+
+  <!-- Board Container -->
+  <div class="board-container">
+    <div class="board-title">상태창</div>
+    <div class="board-grid">
+      <div class="board-section" data-category="toilet">
+        <div class="section-title">화장실(물)</div>
+        <div class="section-content" id="toilet-content"></div>
+      </div>
+      <div class="board-section" data-category="hallway">
+        <div class="section-title">복도</div>
+        <div class="section-content" id="hallway-content"></div>
+      </div>
+      <div class="board-section" data-category="club">
+        <div class="section-title">동아리</div>
+        <div class="section-content" id="club-content"></div>
+      </div>
+      <div class="board-section" data-category="afterschool">
+        <div class="section-title">방과후</div>
+        <div class="section-content" id="afterschool-content"></div>
+      </div>
+      <div class="board-section" data-category="etc">
+        <div class="section-title">기타</div>
+        <div class="section-content" id="etc-content"></div>
+      </div>
+      <div class="board-section" data-category="absence">
+        <div class="section-title">결석(조퇴)</div>
+        <div class="section-content" id="absence-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clock -->
+  <div class="clock-container">
+    <div class="analog-clock">
+      <div class="clock-center"></div>
+      <div class="hand hour-hand" id="hourHand"></div>
+      <div class="hand minute-hand" id="minuteHand"></div>
+      <div class="hand second-hand" id="secondHand"></div>
+      <!-- Hour markers -->
+      <div class="marker major" style="transform: translateX(-50%) rotate(0deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(30deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(60deg);"></div>
+      <div class="marker major" style="transform: translateX(-50%) rotate(90deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(120deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(150deg);"></div>
+      <div class="marker major" style="transform: translateX(-50%) rotate(180deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(210deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(240deg);"></div>
+      <div class="marker major" style="transform: translateX(-50%) rotate(270deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(300deg);"></div>
+      <div class="marker" style="transform: translateX(-50%) rotate(330deg);"></div>
+    </div>
+
+    <div class="digital-clock">
+      <div class="time-display">
+        <span id="hours">00</span>:<span id="minutes">00</span><span class="seconds" id="seconds">00</span>
+      </div>
+      <div class="date-display" id="date">MONDAY, JANUARY 1</div>
+      <div class="tstat" id="tstat"></div>
+    </div>
+  </div>
+
+  <!-- Attendance Info -->
+  <div class="attendance-info">
+    <div><span class="label">총원</span><span class="number" id="total-count">30명</span></div>
+    <div><span class="label">결원</span><span class="number absent-count" id="absent-count">0명</span></div>
+    <div><span class="label">현원</span><span class="number" id="present-count">30명</span></div>
+  </div>
+
+  <!-- Fullscreen Buttons -->
+  <button class="fullscreen-btn" onclick="toggleFullscreen()">전체화면</button>
+  <button class="exit-fullscreen-btn" onclick="exitFullscreen()">✕</button>
+
+  <!-- 급식 버튼 -->
+  <div class="gfab-container" aria-live="polite">
+    <button id="infoFab" class="fab" aria-haspopup="true" aria-expanded="false" aria-controls="infoMenu" title="게임 메뉴">
+      <img src="src/infoicn.png" alt="정보"/>
+    </button>
+    <div id="infoMenu" class="fab-menu" role="menu">
+      <button class="fab-item" role="menuitem" id="foodItem">오늘 급식 보기</button>
+    </div>
+  </div>
+
+  <!-- Fireworks canvas container -->
+  <div class="fireworks" aria-hidden="true"></div>
+
+  <!-- 이유 입력 다이얼로그 -->
+  <div id="reasonOverlay" class="dialog-overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="reasonTitle">
+      <div class="dialog-title" id="reasonTitle">어떤 이유인가요?</div>
+      <textarea id="reasonInput" placeholder="예: 병원 예약, 상담, 급한 용무 등" rows="4" ></textarea>
+      <div id="reasonQuickWrap" class="reason-quick">
+        <div id="reasonButtons" class="reason-quick__grid"></div>
+      </div>
+      <div class="actions">
+        <button id="reasonCancel" type="button">취소</button>
+        <button id="reasonSave" class="primary" type="button">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress">
+    <span id = "start-time">1</span>
+    <progress id="progressbar" value="0" max="100">
+
+    </progress>
+    <span id = "end-time">1</span>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+  <script>
+    window.__PAGE_PROPS__ = {{ page_props | tojson }};
+  </script>
+  
+  <script src="js/storage.js"></script>
+  <script src="js/magnet.js"></script>
+  <script src="js/time.js"></script>
+  <script src="js/etc.js"></script>
+  <script src="js/info.js"></script>
+
+</body>
+</html>

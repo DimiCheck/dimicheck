@@ -132,7 +132,10 @@ function toggleFullscreen() {
 }
 
   // 초기화
-  createMagnets();
+  const {config} = window.App;
+  console.log(config);
+  
+  createMagnets(config.classSize, config.skipNumbers);
   loadState();
 
   updateAttendance();
