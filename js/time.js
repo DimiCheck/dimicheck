@@ -40,6 +40,14 @@ function toggleFullscreen() {
   document.getElementById('hourHand').style.transform   = `translateX(-50%) rotate(${hoursDeg}deg)`;
   document.getElementById('minuteHand').style.transform = `translateX(-50%) rotate(${minutesDeg}deg)`;
   document.getElementById('secondHand').style.transform = `translateX(-50%) rotate(${secondsDeg}deg)`;
+  const sh = document.getElementById('secondHand');
+  sh.style.transition = 'transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';
+  if (now.getSeconds() == 59) { // 59.5초에 베지어 없애고 각도 초기화
+    setTimeout(() => {
+      sh.style.transition = '';
+      sh.style.transform = 'translateX(-50%) rotate(-6deg)';
+    }, 500);
+  }
 
   // ===== 3) 구간(phase) 정의 & 찾기 =====
   // 분 단위로 하루 타임라인 정의 (startMin <= 현재 < endMin)
@@ -139,7 +147,8 @@ function toggleFullscreen() {
   updateEtcReasonPanel();
   updateClock();
   setInterval(updateClock, 1000);
-  setTimeout(() => {
-    const sh = document.getElementById('secondHand');
-    if (sh) sh.style.transition = 'transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';
-  }, 1000);
+  // setTimeout(() => {
+  //   const sh = document.getElementById('secondHand');
+  //   if (sh) sh.style.transition = 'transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';
+
+  // }, 1000);
