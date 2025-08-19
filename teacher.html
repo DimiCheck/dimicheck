@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학년 현황</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 40px;
+        }
+
+        .main-container { width: 100%; max-width: 1200px; }
+
+        /* 상단 헤더 */
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 20px; }
+
+        .header-title {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        /* 학년 버튼 */
+        .grade-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .grade-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+    }
+
+    /* 활성화된 버튼 */
+    .grade-btn.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.35);
+        color: #fff;
+        font-weight: 600;
+    }
+
+        .header-right { display: flex; gap: 15px; }
+
+        .meal-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .meal-btn:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
+
+        .input-hint { color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-top: 10px; }
+
+        /* 메인 타이틀 */
+        .main-title {
+            color: #fff;
+            font-size: 38px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 8px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        /* 반 그리드 */
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .class-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            min-height: 200px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .class-card:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-3px); }
+
+        .class-header {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .student-slots { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+
+        .student-slot { color: rgba(255, 255, 255, 0.7); font-size: 20px; font-weight: 400; display: flex; align-items: center; gap: 8px; }
+
+        .student-name { color: #fff; }
+
+        .empty-slot { color: rgba(255, 255, 255, 0.3); }
+
+        .class-footer { color: rgba(255, 255, 255, 0.5); font-size: 14px; margin-top: 15px; }
+
+        /* 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .class-card:nth-child(1) { animation-delay: 0.1s; }
+        .class-card:nth-child(2) { animation-delay: 0.2s; }
+        .class-card:nth-child(3) { animation-delay: 0.3s; }
+        .class-card:nth-child(4) { animation-delay: 0.4s; }
+        .class-card:nth-child(5) { animation-delay: 0.5s; }
+        .class-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* 반응형: 버튼 줄바꿈 */
+        @media (max-width: 640px) {
+            .header { flex-direction: column; align-items: stretch; gap: 16px; }
+            .header-left { justify-content: space-between; }
+            .grade-buttons { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- 상단 헤더 -->
+        <div class="header">
+            <div class="header-left">
+                <h1 class="header-title">학년 현황</h1>
+                <!-- 학년 버튼 -->
+                <div class="grade-buttons" id="gradeButtons" role="group" aria-label="학년 선택">
+                    <button class="grade-btn" data-grade="1" aria-pressed="true">1학년</button>
+                    <button class="grade-btn" data-grade="2" aria-pressed="false">2학년</button>
+                    <button class="grade-btn" data-grade="3" aria-pressed="false">3학년</button>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="meal-btn">총원</button>
+                <button class="meal-btn">결원</button>
+                <button class="meal-btn">현원</button>
+            </div>
+        </div>
+
+        <div class="input-hint">학군 업데이트: --:--</div>
+
+        <!-- 메인 타이틀 (선택된 학년 숫자 반영) -->
+        <h2 class="main-title"><span id="gradeLabel">1</span>학년 반 현황</h2>
+
+        <!-- 반 그리드 -->
+        <div class="class-grid" id="classGrid">
+            <!-- 1-1반 -->
+            <div class="class-card">
+                <div class="class-header">1-1반</div>
+                <div class="student-slots">
+                    <div class="student-slot">
+                        <span class="student-name">총원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">결원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">현원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                </div>
+                <div class="class-footer">10번 한다이 병원 외출</div>
+            </div>
+
+            <!-- 1-2반 -->
+            <div class="class-card">
+                <div class="class-header">1-2반</div>
+                <div class="student-slots">
+                    <div class="student-slot">
+                        <span class="student-name">총원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">결원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">현원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                </div>
+                <div class="class-footer"></div>
+            </div>
+
+            <!-- 1-3반 -->
+            <div class="class-card">
+                <div class="class-header">1-3반</div>
+                <div class="student-slots">
+                    <div class="student-slot">
+                        <span class="student-name">총원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">결원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">현원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                </div>
+                <div class="class-footer">25번 울길동 학교장 인정 결석</div>
+            </div>
+
+            <!-- 1-4반 -->
+            <div class="class-card">
+                <div class="class-header">1-4반</div>
+                <div class="student-slots">
+                    <div class="student-slot">
+                        <span class="student-name">총원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">결원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">현원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                </div>
+                <div class="class-footer"></div>
+            </div>
+
+            <!-- 1-5반 -->
+            <div class="class-card">
+                <div class="class-header">1-5반</div>
+                <div class="student-slots">
+                    <div class="student-slot">
+                        <span class="student-name">총원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">결원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">현원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                </div>
+                <div class="class-footer"></div>
+            </div>
+
+            <!-- 1-6반 -->
+            <div class="class-card">
+                <div class="class-header">1-6반</div>
+                <div class="student-slots">
+                    <div class="student-slot">
+                        <span class="student-name">총원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">결원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                    <div class="student-slot">
+                        <span class="student-name">현원</span>
+                        <span class="empty-slot">--</span>
+                    </div>
+                </div>
+                <div class="class-footer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 초기 학년
+        let currentGrade = 1;
+
+        // 학년 버튼 클릭 처리
+        const gradeButtons = document.querySelectorAll('.grade-btn');
+        gradeButtons.forEach(btn => {
+            if (btn.dataset.grade === String(currentGrade)) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
+            }
+
+            btn.addEventListener('click', () => {
+                const grade = Number(btn.dataset.grade);
+                setActiveGradeButton(grade);
+                updateClassDisplay(grade);
+                updateMainTitle(grade);
+            });
+        });
+
+        function setActiveGradeButton(grade) {
+            currentGrade = grade;
+            gradeButtons.forEach(b => {
+                const isActive = Number(b.dataset.grade) === grade;
+                b.classList.toggle('active', isActive);
+                b.setAttribute('aria-pressed', String(isActive));
+            });
+        }
+
+        function updateMainTitle(grade) {
+            const label = document.getElementById('gradeLabel');
+            label.textContent = grade;
+        }
+
+        function updateClassDisplay(grade) {
+            const classGrid = document.getElementById('classGrid');
+            const cards = classGrid.querySelectorAll('.class-card');
+
+            // 각 카드의 헤더 업데이트
+            cards.forEach((card, index) => {
+                const header = card.querySelector('.class-header');
+                header.textContent = `${grade}-${index + 1}반`;
+            });
+
+            // 애니메이션 재실행
+            cards.forEach((card, index) => {
+                card.style.animation = 'none';
+                // 강제 리플로우로 애니메이션 재시작 보장
+                void card.offsetWidth;
+                card.style.animation = `fadeIn 0.6s ease-out`;
+                card.style.animationDelay = `${0.1 * (index + 1)}s`;
+            });
+        }
+
+        // 버튼 클릭 효과
+        document.querySelectorAll('.meal-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => { this.style.transform = ''; }, 100);
+            });
+        });
+
+        // 초기 렌더(페이지 로드 시 제목/카드 동기화)
+        updateMainTitle(currentGrade);
+        updateClassDisplay(currentGrade);
+    </script>
+</body>
+</html>
