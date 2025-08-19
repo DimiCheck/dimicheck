@@ -1,15 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Modern Clock + Board + Noise Alert</title>
-  <link rel="stylesheet" href="main.css">
-  <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>학년·반 선택</title>
+  <link rel="stylesheet" href="main.css" />
 </head>
-
 <body>
-    <button>dd</button>
-</body>
+  <div class="board-container">
+    <div class="board-title">학년/반 선택</div>
+    <div class="board-grid">
+      
+      <!-- 1학년 -->
+      <div class="board-section">
+        <div class="section-title">1학년</div>
+        <div class="section-content">
+          <a class="reason-btn" href="/?grade=1&section=1">1반</a>
+          <a class="reason-btn" href="/?grade=1&section=2">2반</a>
+          <a class="reason-btn" href="/?grade=1&section=3">3반</a>
+          <a class="reason-btn" href="/?grade=1&section=4">4반</a>
+          <a class="reason-btn" href="/?grade=1&section=5">5반</a>
+          <a class="reason-btn" href="/?grade=1&section=6">6반</a>
+        </div>
+      </div>
 
+      <!-- 2학년 -->
+      <div class="board-section">
+        <div class="section-title">2학년</div>
+        <div class="section-content">
+          <a class="reason-btn" href="/?grade=2&section=1">1반</a>
+          <a class="reason-btn" href="/?grade=2&section=2">2반</a>
+          <a class="reason-btn" href="/?grade=2&section=3">3반</a>
+          <a class="reason-btn" href="/?grade=2&section=4">4반</a>
+          <a class="reason-btn" href="/?grade=2&section=5">5반</a>
+          <a class="reason-btn" href="/?grade=2&section=6">6반</a>
+        </div>
+      </div>
+
+      <!-- 3학년 -->
+      <div class="board-section">
+        <div class="section-title">3학년</div>
+        <div class="section-content">
+          <a class="reason-btn" href="/?grade=3&section=1">1반</a>
+          <a class="reason-btn" href="/?grade=3&section=2">2반</a>
+          <a class="reason-btn" href="/?grade=3&section=3">3반</a>
+          <a class="reason-btn" href="/?grade=3&section=4">4반</a>
+          <a class="reason-btn" href="/?grade=3&section=5">5반</a>
+          <a class="reason-btn" href="/?grade=3&section=6">6반</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
 </html>
