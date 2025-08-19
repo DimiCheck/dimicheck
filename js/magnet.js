@@ -22,25 +22,22 @@ function createPlaceholder(num) {
 }
 
 /* ===================== 자석 생성 ===================== */
-function createMagnets() {
+function createMagnets(end = 31, skipNumbers = [12]) {
   const container = document.getElementById('magnetContainer');
-  const rows = 6, cols = 5, size = 50, gap = 15;
+  const rows = 7, cols = 5, size = 50, gap = 15;
   let n = 1;
+  const allowed = new Set();
+  for (let i=1; i<=end; i++) if (!(skipNumbers||[]).includes(i)) allowed.add(i);
 
   function getColorClass(num) {
-    if (num >= 1 && num <= 5)   return 'color-red';
-    if (num >= 6 && num <= 10)  return 'color-orange';
-    if (num >= 11 && num <= 16) return 'color-yellow';
-    if (num >= 17 && num <= 21) return 'color-green';
-    if (num >= 22 && num <= 26) return 'color-blue';
-    if (num >= 27 && num <= 31) return 'color-purple';
-    return '';
+    const bands = ['color-red','color-orange','color-yellow','color-green','color-blue','color-purple'];
+    return bands[num%6];
   }
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      if (n > 31) break;
-      if (n === 12) { n++; if (n > 31) break; } // 12번 건너뛰기
+      while (!allowed.has(n) && n < end){n++; console.log(n);}
+      if (n > end){break;}
 
       const x = c * (size + gap) + 50;
       const y = r * (size + gap) + 500;
@@ -51,7 +48,7 @@ function createMagnets() {
 
       const m = document.createElement('div');
       m.className = 'magnet';
-      const colorClass = getColorClass(n);
+      const colorClass = getColorClass(r);
       if (colorClass) m.classList.add(colorClass);
 
       m.textContent = n;
@@ -61,6 +58,7 @@ function createMagnets() {
 
       container.appendChild(m);
       addDragFunctionality(m);
+
       n++;
     }
   }
