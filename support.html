@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>DimiCheck Support</title>
+  <!-- 대체 왜 여기서 이걸 보시는지는 모르겠지만 코드는 뭐가 없어요. 맞아요, GPT가 짜줬답니다. 이런 사이트는 굳이 사람이 만들 필요까진 없잖아요. 깃허브에 별 하나 찍고 가세요. 감사합니다. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box;}
+    html {scroll-behavior: smooth;}
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    #bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    header {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    header h1 {
+      font-size: 4em;
+      margin-bottom: 15px;
+      white-space: nowrap;
+      text-shadow: 0 0 20px #38bdf8, 0 0 40px #3b82f6;
+    }
+    header p {
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      opacity: 0.85;
+    }
+    .scroll-down {
+      position: absolute;
+      bottom: 30px;
+      font-size: 1.2em;
+      opacity: 0.7;
+      animation: bounce 1.5s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% {transform: translateY(0);}
+      50% {transform: translateY(10px);}
+    }
+
+    section {
+      padding: 100px 20px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 1s ease;
+    }
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .card {
+      perspective: 1000px;
+      width: 260px;
+      height: 200px;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s;
+    }
+    /* .card:hover .card-inner {
+      transform: rotateY(180deg);
+    } */
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+    }
+    .card-back {
+      transform: rotateY(180deg);
+      background: rgba(250,204,21,0.9);
+      color: #111;
+      font-weight: bold;
+    }
+    a.btn {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #facc15, #fcd34d);
+      color: #1e293b;
+      font-weight: bold;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    a.btn:hover {transform: scale(1.1);}
+
+    footer {
+      margin-top: 80px;
+      text-align: center;
+      padding: 50px;
+      background: rgba(255,255,255,0.05);
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 1s ease;
+    }
+    footer.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .contributors {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .contributors .c-card {
+      perspective: 1000px;
+      width: 100px;
+      height: 130px;
+    }
+    .contributors .inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s;
+    }
+    .contributors .c-card:hover .inner {
+      transform: rotateY(180deg);
+    }
+    .contributors .face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .contributors .back {
+      transform: rotateY(180deg);
+      background: #facc15;
+      color: #111;
+      font-weight: bold;
+    }
+    .contributors img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <header>
+    <h1 id="title" style="font-size: clamp(20px, 10vw, 80px); "></h1>
+    <p>여러분의 ⭐ 하나가 우리를 더 강하게 만듭니다!</p>
+    <iframe src="https://ghbtns.com/github-btn.html?user=dimicheck&repo=dimicheck&type=star&count=true&size=large"
+            frameborder="0" scrolling="0" width="170" height="35" title="GitHub"></iframe>
+    <div class="scroll-down">⬇ Scroll</div>
+  </header>
+
+  <section id="section1">
+    <h2>어떻게 도와줄 수 있나요?</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-face">
+            <h2>버그 제보</h2>
+            <p>발견한 오류를 알려주세요.</p>
+            <a href="https://github.com/dimicheck/dimicheck/issues" target="_blank" class="btn">제보하기</a>
+          </div>
+          <div class="card-face card-back">
+            Issue에 report하면 됩니다.
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-face">
+            <h2>기능 제안</h2>
+            <p>새로운 아이디어를 공유해주세요.</p>
+            <a href="https://github.com/dimicheck/dimicheck/issues" target="_blank" class="btn">제안하기</a>
+          </div>
+          <div class="card-face card-back">
+            일단 적고 보세요.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contributors">
+    <h2>👩‍💻 Contributors</h2>
+    <div class="contributors">
+      <a href="https://github.com/abcdana122" target="_blank">
+      <div class="c-card">
+        <div class="inner">
+          <div class="face">
+            <img src="https://github.com/abcdana122.png" alt="abcdana122">
+          </div>
+          <div class="face back">abcdana122</div>
+        </div>
+      </div>
+      </a>
+      <a href="https://github.com/hjun1052" target="_blank">
+      <div class="c-card">
+        <div class="inner">
+          <div class="face">
+            <img src="https://github.com/hjun1052.png" alt="hjun1052">
+          </div>
+          <div class="face back">hjun1052</div>
+        </div>
+      </div>
+      </a>
+      <a href="https://github.com/zackalzackal" target="_blank">
+      <div class="c-card">
+        <div class="inner">
+          <div class="face">
+            <img src="https://github.com/zackalzackal.png" alt="zackalzackal">
+          </div>
+          <div class="face back">zackalzackal</div>
+        </div>
+      </div>
+      </a>
+      <a href="https://github.com/CTPR037" target="_blank">
+      <div class="c-card">
+        <div class="inner">
+          <div class="face">
+            <img src="https://github.com/CTPR037.png" alt="CTPR037">
+          </div>
+          <div class="face back">CTPR037</div>
+        </div>
+      </div>
+      </a>
+      <a href="https://github.com/farrell508" target="_blank">
+      <div class="c-card">
+        <div class="inner">
+          <div class="face">
+            <img src="https://github.com/farrell508.png" alt="farrell508">
+          </div>
+          <div class="face back">farrell508</div>
+        </div>
+      </div>
+      </a>
+    </div>
+    <p>Made with ❤️ by DimiCheck Team</p>
+  </footer>
+
+  <script>
+    const titleText = "DimiCheck Support";
+    const titleEl = document.getElementById("title");
+    let idx = 0;
+    function typing() {
+      if (idx < titleText.length) {
+        titleEl.innerHTML += titleText[idx];
+        idx++;
+        setTimeout(typing, 100);
+      }
+    }
+    typing();
+
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        z: Math.random() * canvas.width,
+        r: Math.random() * 2 + 1
+      });
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(15,23,42,0.3)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let p of particles) {
+        let scale = 200 / (200 + p.z);
+        let x = (p.x - canvas.width/2) * scale + canvas.width/2;
+        let y = (p.y - canvas.height/2) * scale + canvas.height/2;
+        ctx.beginPath();
+        ctx.arc(x, y, p.r * scale, 0, Math.PI*2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+        p.z -= 2;
+        if (p.z <= 0) p.z = canvas.width;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    const sections = document.querySelectorAll("section, footer");
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    }, {threshold: 0.2});
+    sections.forEach(s => observer.observe(s));
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
