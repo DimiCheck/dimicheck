@@ -1,3 +1,62 @@
+/* ===================== 시간 기반 이벤트 이미지 ===================== */
+const displayedEvents = {};
+
+function updateEventImage(phase) {
+    const container = document.getElementById('timeEventContainer');
+    if (!container) return;
+
+    const breakImg = document.getElementById('eventImageBreak');
+    const studyImg = document.getElementById('eventImageStudy');
+    const lunchImg = document.getElementById('eventImageLunch');
+
+    if (!phase) {
+        // If there's no active phase, ensure everything is hidden.
+        container.classList.remove('visible');
+        [breakImg, studyImg, lunchImg].forEach(img => img.classList.remove('active'));
+        return;
+    }
+
+    // Create a unique key for this specific event instance (date + phase start time)
+    const eventKey = `${new Date().toDateString()}_${phase.label}_${phase.startMin}`;
+
+    // If this event's image has already been shown, do nothing.
+    if (displayedEvents[eventKey]) {
+        return;
+    }
+
+    let activeImage = null;
+    const label = phase.label;
+
+    if (label.includes('쉬는 시간')) {
+        activeImage = breakImg;
+    } else if (label.includes('자습') || label.includes('방과후') || label.includes('야자') || label.includes('아침 시간')) {
+        activeImage = studyImg;
+    } else if (label.includes('점심') || label.includes('저녁')) {
+        activeImage = lunchImg;
+    }
+
+    if (activeImage) {
+        // Mark as displayed
+        displayedEvents[eventKey] = true;
+
+        // Show the container and the active image
+        container.classList.add('visible');
+        activeImage.classList.add('active');
+
+        // Hide it after 5 seconds
+        setTimeout(() => {
+            activeImage.classList.add('hiding');
+
+            // Wait for the disappear animation to finish before hiding the container
+            activeImage.addEventListener('animationend', () => {
+                container.classList.remove('visible');
+                activeImage.classList.remove('active');
+                activeImage.classList.remove('hiding');
+            }, { once: true });
+        }, 5000); // 5 seconds
+    }
+}
+
 /* ===================== 전체화면/시계 ===================== */
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
@@ -81,6 +140,10 @@ function toggleFullscreen() {
     if (curMin >= p.startMin && curMin < p.endMin) { phase = p; break; }
   }
 
+  updateEventImage(phase);
+
+  const countdownContainer = document.getElementById('finalCountdown');
+
   // ===== 4) 특수 카운트다운(22:49:50~22:49:59) =====
   const hh = Number(h), mm = Number(m), ss = Number(s);
   let overrideLabel = null;
@@ -88,9 +151,19 @@ function toggleFullscreen() {
     overrideLabel = String(60 - ss); // 10~1 초 카운트다운
   }
 
+  // Handle the large countdown display
+  if (countdownContainer) {
+    if (overrideLabel !== null) {
+      countdownContainer.textContent = overrideLabel;
+      countdownContainer.classList.add('visible');
+    } else {
+      countdownContainer.classList.remove('visible');
+    }
+  }
+
   // ===== 5) 상태 텍스트 & 불꽃놀이 =====
   if (overrideLabel !== null) {
-    tstatEl.textContent = overrideLabel;
+    tstatEl.textContent = ''; // Hide small counter during big countdown
   } else if (phase) {
     tstatEl.textContent = phase.label;
   } else {
@@ -146,7 +219,7 @@ function toggleFullscreen() {
   updateAttendance();
   updateEtcReasonPanel();
   updateClock();
-  setInterval(updateClock, 1000);
+  const clockInterval = setInterval(updateClock, 1000);
   // setTimeout(() => {
   //   const sh = document.getElementById('secondHand');
   //   if (sh) sh.style.transition = 'transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';

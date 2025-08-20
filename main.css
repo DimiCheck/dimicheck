@@ -634,3 +634,93 @@
   height: 40px;
 }
   
+
+/* Time-based Event Image */
+.time-event-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 2000; /* Ensure it's on top of most elements */
+    visibility: hidden;
+}
+
+.time-event-container img {
+    display: none; /* Hide all images by default */
+    max-width: 80vw;
+    max-height: 80vh;
+    object-fit: contain;
+    animation-duration: 0.8s;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth ease-out */
+}
+
+.time-event-container.visible {
+    visibility: visible;
+}
+
+.time-event-container.visible img.active {
+    display: block;
+    animation-name: riseUp;
+}
+
+@keyframes riseUp {
+    from {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes goDown {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+    }
+}
+
+.time-event-container.visible img.active.hiding {
+    animation-name: goDown;
+}
+
+/* Final Countdown */
+.final-countdown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 40vw; /* Very large font size */
+    font-weight: 900; /* Bold */
+    -webkit-text-stroke: 4px rgba(0,0,0,0.5); /* Text outline */
+    text-shadow: 0 0 80px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    z-index: 2001; /* Higher than the event images */
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+}
+
+.final-countdown.visible {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0s;
+}
