@@ -80,9 +80,13 @@
 
         .status-card { cursor: pointer; position: relative; }
         .status-card.selected {
-            outline: 2px solid rgba(76,175,80,.35);
-            box-shadow: 0 10px 30px rgba(76,175,80,.15);
+            outline: 2px solid #ed098059;
+            box-shadow: 0 10px 30px #ed098026;
             transform: translateY(-2px);
+        }
+        .status-card.selected.completed {
+            outline-color: rgba(76, 175, 80, 0.5);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
         }
         .status-label { color: var(--text-strong); font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: .5px; }
         .status-description { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
@@ -280,7 +284,7 @@
         }
 
         // 새로운 카드 선택
-        statusCards.forEach(c => c.classList.remove('selected'));
+        statusCards.forEach(c => c.classList.remove('selected', 'completed'));
         card.classList.add('selected');
         selectedStatus = card.dataset.status;
 
@@ -350,6 +354,13 @@
         // 완료 버튼
         document.getElementById('submitBtn').addEventListener('click', function() {
             if (!selectedStatus) { alert('상태를 선택해주세요.'); return; }
+
+            // 선택된 카드에 completed 클래스 추가
+            const selectedCard = document.querySelector('.status-card.selected');
+            if (selectedCard) {
+                selectedCard.classList.add('completed');
+            }
+
             const oldText = this.textContent;
             this.style.transform = 'scale(0.95)';
             this.textContent = '저장됨!';
