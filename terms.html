@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>약관 동의 | DimiCheck</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-2: #0e1218;
+      --card: rgba(255, 255, 255, .08);
+      --card-2: rgba(255, 255, 255, .06);
+      --text: #e9eef6;
+      --muted: #a7b0c0;
+      --primary: #d04fff;
+      --primary-2: #ff6ad0;
+      --ring: 0 0 0 8px color-mix(in oklab, var(--primary) 30%, transparent);
+      --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+      --radius: 20px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f8fb;
+        --bg-2: #eef2f8;
+        --card: rgba(255, 255, 255, .75);
+        --card-2: rgba(255, 255, 255, .6);
+        --text: #0f172a;
+        --muted: #5b6475;
+        --primary: #d04fff;
+        --primary-2: #ff6ad0;
+        --shadow: 0 10px 30px rgba(57, 72, 103, .15);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #5a6cff20, transparent 60%),
+        radial-gradient(1200px 800px at 110% 10%, #ff009025, transparent 60%),
+        radial-gradient(1000px 700px at 50% 120%, #ff00b325, transparent 60%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      inset: auto;
+      filter: blur(40px);
+      opacity: .6;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .b1 {
+      width: 48vw;
+      height: 48vw;
+      background: radial-gradient(circle, #ff6a6a60, transparent 70%);
+      top: -10vh;
+      left: -10vw;
+      animation: float 18s ease-in-out infinite;
+    }
+
+    .b2 {
+      width: 42vw;
+      height: 42vw;
+      background: radial-gradient(circle, #e100ff50, transparent 70%);
+      bottom: -15vh;
+      right: -10vw;
+      animation: float 22s ease-in-out infinite reverse;
+    }
+
+    .b3 {
+      width: 36vw;
+      height: 36vw;
+      background: radial-gradient(circle, #ff6ae950, transparent 70%);
+      top: 40vh;
+      left: 10vw;
+      animation: float 26s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-20px)
+      }
+    }
+
+    .shell {
+      position: relative;
+      width: min(1100px, 92vw);
+      height: min(680px, 92vh);
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      grid-template-areas: 'consent hero';
+      gap: 18px;
+      padding: 18px;
+      z-index: 1;
+    }
+
+    @media (max-width: 960px) {
+      .shell {
+        grid-template-columns: 1fr;
+        grid-template-areas: 'consent' 'hero';
+        height: auto;
+        padding: 20px;
+        gap: 14px;
+      }
+
+      .row {
+        flex-wrap: wrap;
+      }
+
+      .row .actions {
+        flex-basis: 100%;
+        margin-left: 34px; /* 22px checkbox + 12px gap */
+        margin-top: 8px;
+      }
+    }
+
+    .panel {
+      position: relative;
+      overflow: clip;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--card), var(--card-2));
+      backdrop-filter: saturate(140%) blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      grid-area: hero;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .brand .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: inset 0 0 18px #ffffff40;
+    }
+
+    .bigcopy {
+      align-self: center;
+      padding: 10px 6px 24px;
+    }
+
+    .h1 {
+      font-size: clamp(28px, 3.2vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin: 0 0 14px;
+    }
+
+    .p {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(14px, 1.7vw, 16px);
+    }
+
+    .hero-cta {
+      align-self: end;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: color-mix(in oklab, var(--card) 70%, rgba(255, 255, 255, .12));
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .illus {
+      position: absolute;
+      right: -6%;
+      bottom: -6%;
+      width: min(560px, 60%);
+      opacity: .9;
+      filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .25));
+      pointer-events: none;
+    }
+
+    @media (max-width:960px) {
+      .illus {
+        position: static;
+        width: 100%;
+        margin-top: 14px;
+      }
+
+      .hero {
+        padding: 20px;
+      }
+    }
+
+    .consent {
+      grid-area: consent;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      align-items: center;
+      padding: 26px;
+    }
+
+    @media (max-width: 960px) {
+      .consent {
+        padding: 18px;
+      }
+    }
+
+    .card {
+      margin: 12px auto 0;
+      width: min(520px, 100%);
+      padding: 22px;
+      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .06));
+      border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid color-mix(in oklab, var(--text) 8%, transparent);
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .check {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1.5px solid color-mix(in oklab, var(--text) 30%, transparent);
+      background: rgba(255, 255, 255, .02);
+      display: grid;
+      place-items: center;
+      margin-top: 2px;
+      cursor: pointer;
+      transition: box-shadow .2s ease, border-color .2s ease, background .2s ease, transform .06s ease;
+      position: relative;
+    }
+
+    .check:focus-visible {
+      outline: none;
+      box-shadow: var(--ring);
+    }
+
+    .check::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+      transform: scale(0.6);
+      transform-origin: center;
+      opacity: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      transition: transform .15s ease, opacity .15s ease;
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      display: block;
+      pointer-events: none;
+    }
+
+    .check[aria-checked="true"] {
+      border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+      background: color-mix(in oklab, var(--primary) 12%, transparent);
+    }
+
+    .check[aria-checked="true"]::after {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .label {
+      flex: 1;
+    }
+
+    .label .title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .label .sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #0b0f14;
+      background: #fff;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, .05);
+      transition: transform .06s ease, box-shadow .2s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+    }
+
+    .btn.cta {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      padding: 12px 14px;
+    }
+
+    .btn[disabled] {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 16px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: rise .6s ease forwards;
+    }
+
+    .fade-up:nth-child(1) {
+      animation-delay: .05s
+    }
+
+    .fade-up:nth-child(2) {
+      animation-delay: .12s
+    }
+
+    .fade-up:nth-child(3) {
+      animation-delay: .20s
+    }
+
+    .fade-up:nth-child(4) {
+      animation-delay: .28s
+    }
+
+    @keyframes rise {
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blob {
+        animation: none
+      }
+
+      .fade-up {
+        opacity: 1;
+        transform: none;
+        animation: none
+      }
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(5, 8, 12, .55);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 10;
+    }
+
+    .modal[open] {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dialog {
+      width: min(860px, 92vw);
+      height: min(76vh, 680px);
+      background: linear-gradient(180deg, var(--card), var(--card-2));
+      border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+
+    .dialog header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+    }
+
+    .dialog header .title {
+      font-weight: 700;
+    }
+
+    .dialog .lang {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dialog .lang button {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .dialog .lang button[aria-pressed="true"] {
+      background: color-mix(in oklab, var(--primary) 12%, transparent);
+      border-color: color-mix(in oklab, var(--primary) 50%, transparent);
+    }
+
+    .dialog main {
+      height: 100%;
+      overflow: auto;
+    }
+
+    .dialog footer {
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      border-top: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <main class="shell" role="main">
+    <section class="panel consent" aria-label="약관 동의">
+      <h3 id="consent-title">서비스 이용을 위해 필수 항목에 동의해 주세요.</h3>
+      <div class="card fade-up" role="region" aria-labelledby="consent-title">
+        <h2 id="consent-title-2">약관 동의</h2>
+        <p>아래 항목은 모두 필수입니다.</p>
+
+        <div class="row" data-key="terms">
+          <button class="check" role="checkbox" aria-checked="false" aria-labelledby="lbl-terms" id="ck-terms"></button>
+          <div class="label">
+            <div class="title" id="lbl-terms">서비스 이용 약관 동의 (Terms of Service)</div>
+            <div class="sub">서비스 이용을 위해 약관을 읽고 동의해 주세요.</div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-open="terms" data-lang="ko" aria-label="서비스 이용 약관 한국어로 보기">보기 (KR)</button>
+            <button class="btn ghost" data-open="terms" data-lang="en" aria-label="서비스 이용 약관 영어로 보기">View (EN)</button>
+          </div>
+        </div>
+
+        <div class="row" data-key="privacy">
+          <button class="check" role="checkbox" aria-checked="false" aria-labelledby="lbl-privacy"
+            id="ck-privacy"></button>
+          <div class="label">
+            <div class="title" id="lbl-privacy">개인정보 처리 방침 동의 (Privacy Policy)</div>
+            <div class="sub">개인정보 보호를 위한 방침을 읽고 동의해 주세요.</div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-open="privacy" data-lang="ko" aria-label="개인정보 처리 방침 한국어로 보기">보기
+              (KR)</button>
+            <button class="btn ghost" data-open="privacy" data-lang="en" aria-label="개인정보 처리 방침 영어로 보기">View
+              (EN)</button>
+          </div>
+        </div>
+        <div class="row" data-key="iamdimin">
+          <button class="check" role="checkbox" aria-checked="false" aria-labelledby="lbl-imdimin"
+            id="ck-imdimin"></button>
+          <div class="label">
+            <div class="title" id="lbl-imdimin">본인은 디미고 재학생 혹은 교직원입니다.</div>
+            <div class="sub">해당하지 않을 경우 가입이 불가합니다.</div>
+          </div>
+        </div>
+
+        <div class="row" style="align-items:center; padding-top:16px;">
+          <button class="check" role="checkbox" aria-checked="false" aria-labelledby="lbl-all" id="ck-all"></button>
+          <div class="label">
+            <div class="title" id="lbl-all">모두 동의</div>
+            <div class="sub">모든 필수 항목을 한 번에 선택합니다.</div>
+          </div>
+        </div>
+
+        <div style="display:grid; gap:10px; margin-top:16px">
+          <button class="btn cta" id="continue" disabled aria-disabled="true" aria-label="동의하고 계속">동의하고 계속</button>
+          <div class="footer">동의는 로컬에 저장되며 언제든지 철회할 수 있습니다. (Stored locally; you can revoke anytime.)</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel hero" aria-label="브랜드 소개">
+      <div class="brand fade-up" aria-label="브랜드">
+        <img class="logo" aria-hidden="true" src="/src/dimicheck_templogo.png">
+        <div>DimiCheck</div>
+      </div>
+      <div class="bigcopy fade-up">
+        <h1 class="h1">DimiCheck</h1>
+        <p class="p">디미고를 위한 새로운 출결인증 플랫폼.</p>
+      </div>
+      <div class="hero-cta fade-up" aria-label="하이라이트">
+        <div class="chip">간편한 출결 인증</div>
+        <div class="chip">원격 상태 확인</div>
+        <div class="chip">다양한 편의 기능</div>
+      </div>
+      <svg class="illus" viewBox="0 0 600 380" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--primary)" />
+            <stop offset="100%" stop-color="var(--primary-2)" />
+          </linearGradient>
+        </defs>
+        <rect x="30" y="40" width="540" height="300" rx="26" fill="url(#g)" opacity=".18" />
+        <rect x="60" y="70" width="480" height="60" rx="14" fill="#fff" opacity=".14" />
+        <rect x="60" y="150" width="240" height="180" rx="18" fill="#fff" opacity=".12" />
+        <rect x="320" y="150" width="220" height="120" rx="18" fill="#fff" opacity=".1" />
+        <circle cx="520" cy="110" r="10" fill="#fff" opacity=".8" />
+        <circle cx="490" cy="110" r="10" fill="#fff" opacity=".6" />
+        <circle cx="460" cy="110" r="10" fill="#fff" opacity=".4" />
+      </svg>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+      <header>
+        <div class="title" id="dlg-title">문서</div>
+        <div class="lang" role="tablist" aria-label="언어 선택">
+          <button role="tab" id="lang-ko" aria-selected="true" aria-pressed="true">한국어</button>
+          <button role="tab" id="lang-en" aria-selected="false" aria-pressed="false">English</button>
+        </div>
+      </header>
+      <main>
+        <iframe id="frame-ko" src="terms-detail.html" title="문서 한국어"></iframe>
+        <iframe id="frame-en" src="terms-detail.html?en=1" title="Document English" class="hidden"></iframe>
+      </main>
+      <footer>
+        <button class="btn ghost" id="close">닫기</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Version your consents so you can invalidate later
+    const CONSENT_VERSION = 'v1';
+    const redirectTarget = './login.html'; // TODO: change target as needed
+    const el = (q) => document.querySelector(q);
+    const allCheck = el('#ck-all');
+    const cks = { terms: el('#ck-terms'), privacy: el('#ck-privacy'), imdimin: el('#ck-imdimin') };
+    const btn = el('#continue');
+    const modal = el('#modal');
+    const frameKo = el('#frame-ko');
+    const frameEn = el('#frame-en');
+    const langKo = el('#lang-ko');
+    const langEn = el('#lang-en');
+    const closeBtn = el('#close');
+
+    // Auto-skip if already accepted (all present with same version)
+    try {
+      const saved = JSON.parse(localStorage.getItem('consents') || '{}');
+      if (saved.version === CONSENT_VERSION && saved.terms && saved.privacy && saved.imdimin) {
+        // Already accepted
+        // location.replace(redirectTarget);
+      }
+    } catch { }
+
+    function syncContinueState() {
+      const allAgreed = Object.values(cks).every(ck => ck.getAttribute('aria-checked') === 'true');
+      btn.disabled = !allAgreed;
+      btn.setAttribute('aria-disabled', String(!allAgreed));
+      allCheck.setAttribute('aria-checked', String(allAgreed));
+    }
+
+    function toggleCheck(button) {
+      const current = button.getAttribute('aria-checked') === 'true';
+      button.setAttribute('aria-checked', String(!current));
+      syncContinueState();
+    }
+
+    allCheck.addEventListener('click', () => {
+      const next = !(allCheck.getAttribute('aria-checked') === 'true');
+      for (const k in cks) cks[k].setAttribute('aria-checked', String(next));
+      syncContinueState();
+    });
+    cks.terms.addEventListener('click', () => toggleCheck(cks.terms));
+    cks.privacy.addEventListener('click', () => toggleCheck(cks.privacy));
+    cks.imdimin.addEventListener('click', () => toggleCheck(cks.imdimin));
+
+    // Open modal with chosen doc and language
+    document.querySelectorAll('[data-open]').forEach(b => {
+      b.addEventListener('click', () => {
+        const doc = b.getAttribute('data-open'); // 'terms' | 'privacy'
+        const lang = b.getAttribute('data-lang'); // 'ko' | 'en'
+        const title = doc === 'terms' ? '서비스 이용 약관' : '개인정보 처리 방침';
+        el('#dlg-title').textContent = title;
+        frameKo.src = doc === 'terms' ? 'terms-detail.html' : 'privacy-detail.html';
+        frameEn.src = doc === 'terms' ? 'terms-detail.html?en=1' : 'privacy-detail.html?en=1';
+        setLang(lang === 'en' ? 'en' : 'ko');
+        openModal();
+      });
+    });
+
+    function setLang(lang) {
+      const isEn = lang === 'en';
+      frameKo.classList.toggle('hidden', isEn);
+      frameEn.classList.toggle('hidden', !isEn);
+      langKo.setAttribute('aria-pressed', String(!isEn));
+      langEn.setAttribute('aria-pressed', String(isEn));
+      langKo.setAttribute('aria-selected', String(!isEn));
+      langEn.setAttribute('aria-selected', String(isEn));
+      // Focus management
+      (isEn ? frameEn : frameKo).focus({ preventScroll: true });
+    }
+
+    langKo.addEventListener('click', () => setLang('ko'));
+    langEn.addEventListener('click', () => setLang('en'));
+
+    function openModal() {
+      modal.setAttribute('open', '');
+      // focus trap start
+      document.addEventListener('keydown', trapTab);
+      document.addEventListener('keydown', onEsc);
+      closeBtn.focus();
+    }
+    function closeModal() {
+      modal.removeAttribute('open');
+      document.removeEventListener('keydown', trapTab);
+      document.removeEventListener('keydown', onEsc);
+    }
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    function onEsc(e) { if (e.key === 'Escape') closeModal(); }
+    function trapTab(e) {
+      if (e.key !== 'Tab') return;
+      const focusables = modal.querySelectorAll('button, [href], iframe, [tabindex]:not([tabindex="-1"])');
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    }
+
+    btn.addEventListener('click', () => {
+      const payload = {
+        version: CONSENT_VERSION,
+        terms: cks.terms.getAttribute('aria-checked') === 'true',
+        privacy: cks.privacy.getAttribute('aria-checked') === 'true',
+        imdimin: cks.imdimin.getAttribute('aria-checked') === 'true',
+        ts: Date.now()
+      };
+      localStorage.setItem('consents', JSON.stringify(payload));
+      // Redirect
+      location.href = redirectTarget;
+    });
+  </script>
+</body>
+
+</html>
