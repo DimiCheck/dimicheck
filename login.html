@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!-- 로그인 버튼 연동은 맨 밑에 있어요 -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>로그인 | DimiCheck</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-2: #0e1218;
+      --card: rgba(255, 255, 255, .08);
+      --card-2: rgba(255, 255, 255, .06);
+      --text: #e9eef6;
+      --muted: #a7b0c0;
+      --primary: #d04fff;
+      --primary-2: #ff6ad0;
+      --ring: 0 0 0 8px color-mix(in oklab, var(--primary) 30%, transparent);
+      --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+      --radius: 20px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f8fb;
+        --bg-2: #eef2f8;
+        --card: rgba(255, 255, 255, .75);
+        --card-2: rgba(255, 255, 255, .6);
+        --text: #0f172a;
+        --muted: #5b6475;
+        --primary: #d04fff;
+        --primary-2: #ff6ad0;
+        --shadow: 0 10px 30px rgba(57, 72, 103, .15);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 10% -10%, #5a6cff20, transparent 60%),
+        radial-gradient(1200px 800px at 110% 10%, #ff009025, transparent 60%),
+        radial-gradient(1000px 700px at 50% 120%, #ff00b325, transparent 60%), var(--bg);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      inset: auto;
+      filter: blur(40px);
+      opacity: .6;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .b1 {
+      width: 48vw;
+      height: 48vw;
+      background: radial-gradient(circle, #ff6a6a60, transparent 70%);
+      top: -10vh;
+      left: -10vw;
+      animation: float 18s ease-in-out infinite;
+    }
+
+    .b2 {
+      width: 42vw;
+      height: 42vw;
+      background: radial-gradient(circle, #e100ff50, transparent 70%);
+      bottom: -15vh;
+      right: -10vw;
+      animation: float 22s ease-in-out infinite reverse;
+    }
+
+    .b3 {
+      width: 36vw;
+      height: 36vw;
+      background: radial-gradient(circle, #ff6ae950, transparent 70%);
+      top: 40vh;
+      left: 10vw;
+      animation: float 26s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-20px)
+      }
+    }
+
+    .shell {
+      position: relative;
+      width: min(1100px, 92vw);
+      height: min(680px, 92vh);
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      grid-template-areas: 'auth hero';
+      gap: 18px;
+      padding: 18px;
+      z-index: 1;
+    }
+
+    @media (max-width: 960px) {
+      .shell {
+        grid-template-columns: 1fr;
+        grid-template-areas: 'auth' 'hero';
+        height: auto;
+        padding: 20px;
+        gap: 14px;
+      }
+    }
+
+    .panel {
+      position: relative;
+      overflow: clip;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--card), var(--card-2));
+      backdrop-filter: saturate(140%) blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      grid-area: hero;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .brand .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: inset 0 0 18px #ffffff40;
+    }
+
+    .hero-cta {
+      align-self: end;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: color-mix(in oklab, var(--card) 70%, rgba(255, 255, 255, .12));
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .bigcopy {
+      align-self: center;
+      padding: 10px 6px 24px;
+    }
+
+    .h1 {
+      font-size: clamp(28px, 3.2vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin: 0 0 14px;
+    }
+
+    .p {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(14px, 1.7vw, 16px);
+    }
+
+    .illus {
+      position: absolute;
+      right: -6%;
+      bottom: -6%;
+      width: min(560px, 60%);
+      opacity: .9;
+      filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .25));
+      pointer-events: none;
+    }
+
+    @media (max-width: 960px) {
+      .illus {
+        position: static;
+        width: 100%;
+        margin-top: 14px;
+      }
+
+      .hero {
+        padding: 20px;
+      }
+    }
+
+    .auth {
+      grid-area: auth;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      align-items: center;
+      padding: 26px;
+    }
+
+    @media (max-width: 960px) {
+      .auth {
+        padding: 18px;
+      }
+    }
+
+    .card {
+      margin: 12px auto 0;
+      width: min(420px, 100%);
+      padding: 22px;
+      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .06));
+      border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+      /* box-shadow: var(--shadow); */
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #0b0f14;
+      background: #fff;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, .05);
+      transition: transform .06s ease, box-shadow .2s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      margin: 12px auto 8px auto;
+    }
+
+    .cta {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 16px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: rise .6s ease forwards;
+    }
+
+    .fade-up:nth-child(1) {
+      animation-delay: .05s
+    }
+
+    .fade-up:nth-child(2) {
+      animation-delay: .12s
+    }
+
+    .fade-up:nth-child(3) {
+      animation-delay: .20s
+    }
+
+    .fade-up:nth-child(4) {
+      animation-delay: .28s
+    }
+
+    @keyframes rise {
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blob {
+        animation: none
+      }
+
+      .fade-up {
+        opacity: 1;
+        transform: none;
+        animation: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <main class="shell" role="main">
+    <section class="panel auth" aria-label="빠른 시작">
+      <h3 id="login-title">학생 ᐧ 교사 통합 로그인</h3>
+      <div class="card fade-up" role="region" aria-labelledby="login-title">
+        <h2 id="login-title">시작하기</h2>
+        <p>DimiCheck 오신 걸 환영합니다.</p>
+        <div class="submit" style="display:grid; gap:10px; margin-top:14px">
+          <button class="btn cta" type="button" aria-label="로그인"><img src="src/dipulllogo.svg" width=20px height=20px>디풀로 로그인</button>
+          <div class="footer" style="margin:0">계정이 없나요? 
+            <button class="btn ghost" type="button" aria-label="디풀에서 계정 만들기"
+              style="width:auto; padding:8px 12px">디풀에서 계정 만들기</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel hero" aria-label="브랜드 소개">
+      <div class="brand fade-up" aria-label="브랜드">
+        <img class="logo" aria-hidden="true" src="/src/dimicheck_templogo.png">
+        <div>DimiCheck</div>
+      </div>
+      <div class="bigcopy fade-up">
+        <h1 class="h1"><br />DimiCheck</h1>
+        <p class="p">디미고를 위한 새로운 출결인증 플랫폼.</p>
+      </div>
+      <div class="hero-cta fade-up" aria-label="하이라이트">
+        <div class="chip">간편한 출결 인증</div>
+        <div class="chip">원격 상태 확인</div>
+        <div class="chip">다양한 편의 기능</div>
+      </div>
+      <svg class="illus" viewBox="0 0 600 380" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--primary)" />
+            <stop offset="100%" stop-color="var(--primary-2)" />
+          </linearGradient>
+        </defs>
+        <rect x="30" y="40" width="540" height="300" rx="26" fill="url(#g)" opacity=".18" />
+        <rect x="60" y="70" width="480" height="60" rx="14" fill="#fff" opacity=".14" />
+        <rect x="60" y="150" width="240" height="180" rx="18" fill="#fff" opacity=".12" />
+        <rect x="320" y="150" width="220" height="120" rx="18" fill="#fff" opacity=".1" />
+        <circle cx="520" cy="110" r="10" fill="#fff" opacity=".8" />
+        <circle cx="490" cy="110" r="10" fill="#fff" opacity=".6" />
+        <circle cx="460" cy="110" r="10" fill="#fff" opacity=".4" />
+      </svg>
+    </section>
+  </main>
+
+  <script>
+    //여기다가 연동하면 됨요
+    document.querySelector('[aria-label="로그인"]').addEventListener('click', () => {
+      // location.href = '/login';
+    });
+    document.querySelector('[aria-label="디풀에서 계정 만들기"]').addEventListener('click', () => {
+      location.href = 'https://auth.dimigo.net/oauth?client=66207bf5d851264633e0e0a8&redirect=https://dimigo.net/auth?redirect=url';
+    });
+  </script>
+</body>
+
+</html>
